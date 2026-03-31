@@ -1,344 +1,1317 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Food Rescue – Rescue Food, Feed Hope</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FoodRescue — Rescue Food, Feed Hope</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════
+   DESIGN TOKENS
+═══════════════════════════ */
+:root {
+  /* Core greens */
+  --forest:    #1a4731;
+  --pine:      #2d6a4f;
+  --sage:      #52b788;
+  --mint:      #95d5b2;
+  --mist:      #d8f3dc;
+  --foam:      #f0faf3;
 
-    :root {
-      --green: #2d6a4f;
-      --green-light: #52b788;
-      --green-pale: #d8f3dc;
-      --amber: #f4a261;
-      --amber-dark: #e76f51;
-      --cream: #fefae0;
-      --dark: #1b1b1b;
-      --mid: #555;
-      --white: #fff;
-      --radius: 16px;
-    }
+  /* Accents */
+  --amber:     #e8873a;
+  --amber-soft:#fdf0e3;
+  --sky:       #3b82f6;
+  --sky-soft:  #eff6ff;
 
-    html { scroll-behavior: smooth; }
+  /* Neutrals */
+  --ink:       #141410;
+  --charcoal:  #3a3a35;
+  --stone:     #7a7a72;
+  --pebble:    #b8b8b0;
+  --cloud:     #f2f2ee;
+  --paper:     #fafaf7;
+  --white:     #ffffff;
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--dark);
-      overflow-x: hidden;
-    }
+  /* Status */
+  --s-available:  #16a34a;
+  --s-avail-bg:   #dcfce7;
+  --s-claimed:    #2563eb;
+  --s-claim-bg:   #dbeafe;
+  --s-expired:    #6b7280;
+  --s-expire-bg:  #f3f4f6;
 
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 48px;
-      background: rgba(254,250,224,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(45,106,79,0.12);
-    }
-    .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem; font-weight: 700;
-      color: var(--green);
-      letter-spacing: -0.5px;
-    }
-    .logo span { color: var(--amber-dark); }
-    .nav-links { display: flex; gap: 32px; align-items: center; }
-    .nav-links a {
-      text-decoration: none; color: var(--mid);
-      font-size: 0.9rem; font-weight: 500;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--green); }
-    .btn-signin {
-      background: var(--dark); color: var(--white);
-      border: none; padding: 10px 22px;
-      border-radius: 8px; cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem; font-weight: 500;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .btn-signin:hover { background: var(--green); transform: translateY(-1px); }
+  /* Layout */
+  --nav-h: 68px;
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
 
-    /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 120px 24px 80px;
-      position: relative;
-      overflow: hidden;
-    }
-    /* organic background blobs */
-    .hero::before {
-      content: '';
-      position: absolute; top: -100px; right: -150px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(82,183,136,0.18) 0%, transparent 70%);
-      border-radius: 50%;
-      animation: float 8s ease-in-out infinite;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; bottom: -80px; left: -120px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(244,162,97,0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      animation: float 10s ease-in-out infinite reverse;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-30px); }
-    }
+  /* Shadows */
+  --sh-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --sh-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --sh-lg: 0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  --sh-xl: 0 24px 64px rgba(0,0,0,0.16);
+}
 
-    .hero-badge {
-      display: inline-block;
-      background: var(--green-pale);
-      color: var(--green);
-      font-size: 0.8rem; font-weight: 600;
-      padding: 6px 16px; border-radius: 999px;
-      margin-bottom: 24px;
-      letter-spacing: 0.5px;
-      animation: fadeUp 0.6s ease both;
-    }
-    .hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.8rem, 7vw, 5.5rem);
-      font-weight: 900; line-height: 1.08;
-      letter-spacing: -2px;
-      color: var(--dark);
-      max-width: 780px;
-      animation: fadeUp 0.7s 0.1s ease both;
-    }
-    .hero h1 em {
-      font-style: normal;
-      color: var(--green);
-    }
-    .hero p {
-      margin: 28px auto 0;
-      max-width: 520px;
-      font-size: 1.1rem; color: var(--mid);
-      line-height: 1.7; font-weight: 300;
-      animation: fadeUp 0.7s 0.2s ease both;
-    }
+[data-theme="dark"] {
+  --forest:    #95d5b2;
+  --pine:      #52b788;
+  --sage:      #95d5b2;
+  --mist:      #1a3d2b;
+  --foam:      #111812;
+  --ink:       #f0f0eb;
+  --charcoal:  #d4d4cc;
+  --stone:     #9a9a92;
+  --pebble:    #5a5a52;
+  --cloud:     #1e1e1a;
+  --paper:     #161614;
+  --white:     #1c1c18;
+  --amber-soft:#2a1f10;
+  --sky-soft:  #0f1729;
+  --s-avail-bg:#0f2a1a;
+  --s-claim-bg:#0f1a2a;
+  --s-expire-bg:#1a1a1a;
+  --sh-sm: 0 1px 4px rgba(0,0,0,0.3);
+  --sh-md: 0 4px 16px rgba(0,0,0,0.4);
+  --sh-lg: 0 12px 40px rgba(0,0,0,0.5);
+}
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+/* ═══════════════════════════
+   RESET & BASE
+═══════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+  transition: background .3s, color .3s;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: 'Outfit', sans-serif; cursor: pointer; }
+a { text-decoration: none; }
+img { display: block; max-width: 100%; }
 
-    /* ── CARDS ── */
-    .cards {
-      display: flex; gap: 24px; justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 56px; position: relative; z-index: 1;
-      animation: fadeUp 0.7s 0.35s ease both;
-    }
-    .card {
-      background: var(--white);
-      border: 1px solid rgba(45,106,79,0.12);
-      border-radius: var(--radius);
-      padding: 40px 36px;
-      width: 280px;
-      text-align: center;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-      transition: transform 0.25s, box-shadow 0.25s;
-    }
-    .card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
-    .card-icon {
-      width: 56px; height: 56px;
-      background: var(--green-pale);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 1.6rem;
-    }
-    .card h3 {
-      font-size: 1.1rem; font-weight: 600;
-      color: var(--dark); margin-bottom: 10px;
-    }
-    .card p { font-size: 0.9rem; color: var(--mid); line-height: 1.6; margin-bottom: 24px; }
-    .btn-primary {
-      display: inline-block;
-      background: var(--dark); color: var(--white);
-      border: none; padding: 12px 28px;
-      border-radius: 10px; cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem; font-weight: 600;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .btn-primary:hover { background: var(--green); transform: translateY(-2px); }
-    .btn-outline {
-      display: inline-block;
-      border: 2px solid var(--dark); color: var(--dark);
-      background: transparent;
-      padding: 11px 28px; border-radius: 10px; cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem; font-weight: 600;
-      text-decoration: none;
-      transition: background 0.2s, color 0.2s, transform 0.15s;
-    }
-    .btn-outline:hover { background: var(--dark); color: var(--white); transform: translateY(-2px); }
+/* ═══════════════════════════
+   LOADER
+═══════════════════════════ */
+#loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--forest);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 24px;
+  transition: opacity .6s, visibility .6s;
+}
+#loader.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+.ld-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 2.4rem; font-weight: 900;
+  color: #fff; letter-spacing: -1px;
+}
+.ld-logo em { font-style: normal; color: var(--amber); }
+.ld-track {
+  width: 180px; height: 2px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 99px; overflow: hidden;
+}
+.ld-bar {
+  height: 100%; width: 0;
+  background: rgba(255,255,255,0.9);
+  border-radius: 99px;
+  animation: ldbar 1.6s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes ldbar { to { width: 100%; } }
+.ld-hint { color: rgba(255,255,255,0.4); font-size: .75rem; letter-spacing: 2px; text-transform: uppercase; }
 
-    /* ── HOW IT WORKS ── */
-    .how {
-      padding: 100px 48px;
-      text-align: center;
-    }
-    .section-tag {
-      font-size: 0.78rem; font-weight: 600; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--green);
-      margin-bottom: 14px;
-    }
-    .how h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 700; letter-spacing: -1px;
-      margin-bottom: 60px;
-    }
-    .steps {
-      display: flex; gap: 0; justify-content: center;
-      flex-wrap: wrap;
-      max-width: 860px; margin: 0 auto;
-      position: relative;
-    }
-    .steps::before {
-      content: '';
-      position: absolute; top: 28px; left: 10%; right: 10%;
-      height: 2px; background: var(--green-pale);
-    }
-    .step {
-      flex: 1; min-width: 160px; max-width: 220px;
-      padding: 0 16px; position: relative; z-index: 1;
-    }
-    .step-num {
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--green); color: var(--white);
-      font-weight: 700; font-size: 1.2rem;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 20px;
-      box-shadow: 0 4px 16px rgba(45,106,79,0.3);
-    }
-    .step h4 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
-    .step p { font-size: 0.85rem; color: var(--mid); line-height: 1.6; }
+/* ═══════════════════════════
+   NAVBAR — clean & minimal
+═══════════════════════════ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: var(--nav-h);
+  display: flex; align-items: center;
+  padding: 0 48px;
+  background: rgba(250,250,247,0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  transition: background .3s, border-color .3s;
+}
+[data-theme="dark"] .nav {
+  background: rgba(22,22,20,0.92);
+  border-bottom-color: rgba(255,255,255,0.06);
+}
 
-    /* ── STATS ── */
-    .stats {
-      background: var(--green);
-      padding: 80px 48px;
-      display: flex; gap: 0; justify-content: center; flex-wrap: wrap;
-    }
-    .stat { flex: 1; min-width: 180px; text-align: center; padding: 20px; }
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem; font-weight: 900;
-      color: var(--white); line-height: 1;
-    }
-    .stat-num span { color: var(--amber); }
-    .stat-label { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 8px; }
+/* logo */
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem; font-weight: 900;
+  color: var(--pine); letter-spacing: -0.5px;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+  transition: opacity .2s;
+}
+.nav-logo:hover { opacity: .8; }
+.nav-logo-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: var(--pine);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.nav-logo em { font-style: normal; color: var(--amber); }
 
-    /* ── FOOTER ── */
-    footer {
-      background: var(--dark);
-      color: rgba(255,255,255,0.5);
-      text-align: center; padding: 32px;
-      font-size: 0.85rem;
-    }
-    footer a { color: var(--green-light); text-decoration: none; }
+/* center spacer */
+.nav-spacer { flex: 1; }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 640px) {
-      nav { padding: 16px 20px; }
-      .how, .stats { padding: 60px 24px; }
-      .steps::before { display: none; }
-    }
-  </style>
+/* nav links */
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+  margin-right: 24px;
+}
+.nav-link {
+  background: none; border: none;
+  padding: 8px 14px; border-radius: var(--r-sm);
+  font-size: .875rem; font-weight: 500;
+  color: var(--stone);
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.nav-link:hover { background: var(--cloud); color: var(--ink); }
+.nav-link.active { background: var(--mist); color: var(--pine); }
+
+/* nav actions */
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+
+/* notif */
+.notif-wrap { position: relative; }
+.notif-trigger {
+  width: 38px; height: 38px; border-radius: var(--r-sm);
+  background: none; border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: var(--stone);
+  transition: background .15s, color .15s; position: relative;
+}
+.notif-trigger:hover { background: var(--cloud); color: var(--ink); }
+.notif-dot {
+  position: absolute; top: 8px; right: 8px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--amber);
+  border: 1.5px solid var(--paper);
+  animation: pulse-ring 2s ease infinite;
+}
+@keyframes pulse-ring {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: .7; }
+}
+
+/* theme toggle */
+.theme-btn {
+  width: 38px; height: 38px; border-radius: var(--r-sm);
+  background: none; border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; color: var(--stone);
+  transition: background .15s, color .15s;
+}
+.theme-btn:hover { background: var(--cloud); color: var(--ink); }
+
+/* divider */
+.nav-divider {
+  width: 1px; height: 22px;
+  background: var(--cloud); margin: 0 4px;
+}
+
+/* cta buttons */
+.btn-ghost {
+  padding: 8px 18px; border-radius: var(--r-sm);
+  background: none; border: 1px solid rgba(0,0,0,0.12);
+  font-size: .875rem; font-weight: 500; color: var(--charcoal);
+  transition: border-color .15s, background .15s;
+}
+.btn-ghost:hover { border-color: var(--pine); background: var(--foam); color: var(--pine); }
+[data-theme="dark"] .btn-ghost { border-color: rgba(255,255,255,0.12); color: var(--charcoal); }
+[data-theme="dark"] .btn-ghost:hover { border-color: var(--pine); background: var(--mist); }
+
+.btn-solid {
+  padding: 8px 20px; border-radius: var(--r-sm);
+  background: var(--pine); border: none;
+  font-size: .875rem; font-weight: 600; color: #fff;
+  transition: background .15s, transform .12s, box-shadow .15s;
+  box-shadow: 0 1px 3px rgba(45,106,79,0.3);
+}
+.btn-solid:hover { background: var(--forest); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,106,79,0.35); }
+.btn-solid:active { transform: translateY(0); }
+
+/* hamburger */
+.ham-btn {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none;
+  width: 38px; height: 38px;
+  align-items: center; justify-content: center;
+  border-radius: var(--r-sm); color: var(--stone);
+}
+.ham-btn:hover { background: var(--cloud); }
+.ham-line {
+  width: 20px; height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform .25s, opacity .25s;
+}
+.ham-btn.open .ham-line:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.ham-btn.open .ham-line:nth-child(2) { opacity: 0; }
+.ham-btn.open .ham-line:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* mobile menu */
+.mobile-menu {
+  display: none; position: fixed;
+  top: var(--nav-h); left: 0; right: 0; z-index: 490;
+  background: var(--paper);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 12px 24px 20px;
+  flex-direction: column; gap: 4px;
+  box-shadow: var(--sh-md);
+}
+.mobile-menu.open { display: flex; }
+.mobile-link {
+  background: none; border: none; text-align: left;
+  padding: 11px 14px; border-radius: var(--r-sm);
+  font-size: .9rem; font-weight: 500; color: var(--charcoal);
+  transition: background .15s;
+}
+.mobile-link:hover { background: var(--cloud); }
+.mobile-divider { height: 1px; background: var(--cloud); margin: 8px 0; }
+.mobile-actions { display: flex; gap: 8px; }
+.mobile-actions button { flex: 1; padding: 10px; border-radius: var(--r-sm); font-size: .875rem; font-weight: 600; }
+
+/* ═══════════════════════════
+   NOTIFICATION PANEL
+═══════════════════════════ */
+.notif-panel {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  width: 320px;
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  overflow: hidden;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top right;
+  transition: all .2s cubic-bezier(.4,0,.2,1);
+  z-index: 600;
+}
+.notif-panel.open {
+  opacity: 1; visibility: visible; pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+.np-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--cloud);
+}
+.np-title { font-size: .9rem; font-weight: 600; }
+.np-clear {
+  background: none; border: none;
+  font-size: .75rem; color: var(--pine); font-weight: 500;
+}
+.np-clear:hover { text-decoration: underline; }
+.np-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--cloud);
+  transition: background .15s; cursor: pointer;
+}
+.np-item:last-child { border-bottom: none; }
+.np-item:hover { background: var(--foam); }
+.np-pip {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 5px;
+}
+.np-pip.green { background: var(--s-available); }
+.np-pip.amber { background: var(--amber); }
+.np-pip.grey  { background: var(--pebble); }
+.np-msg { font-size: .8rem; line-height: 1.5; color: var(--charcoal); }
+.np-msg strong { color: var(--ink); }
+.np-time { font-size: .7rem; color: var(--pebble); margin-top: 3px; }
+
+/* ═══════════════════════════
+   HERO
+═══════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: calc(var(--nav-h) + 40px) 24px 60px;
+  position: relative; overflow: hidden;
+
+  /* subtle organic background */
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 90%, rgba(149,213,178,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 10%, rgba(232,135,58,0.10) 0%, transparent 55%),
+    var(--paper);
+}
+[data-theme="dark"] .hero {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 90%, rgba(45,106,79,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 10%, rgba(232,135,58,0.08) 0%, transparent 55%),
+    var(--paper);
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--mist); color: var(--pine);
+  font-size: .75rem; font-weight: 600; letter-spacing: .5px;
+  padding: 5px 14px; border-radius: 99px;
+  margin-bottom: 24px;
+  animation: up .5s ease both;
+}
+
+.hero-h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 900; line-height: 1.06; letter-spacing: -2.5px;
+  color: var(--ink); max-width: 700px;
+  animation: up .55s .06s ease both;
+}
+.hero-h1 em { font-style: italic; color: var(--pine); }
+
+.hero-desc {
+  margin: 20px auto 0; max-width: 440px;
+  font-size: 1rem; color: var(--stone); line-height: 1.7;
+  animation: up .55s .12s ease both;
+}
+
+@keyframes up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* hero cards */
+.hero-cards {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  justify-content: center; margin-top: 40px;
+  animation: up .55s .18s ease both;
+}
+.hero-card {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: var(--r-xl);
+  padding: 28px 26px 24px;
+  width: 220px; text-align: center;
+  box-shadow: var(--sh-md);
+  transition: transform .25s, box-shadow .25s;
+  cursor: pointer;
+}
+.hero-card:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); }
+[data-theme="dark"] .hero-card { border-color: rgba(255,255,255,0.06); }
+
+.hc-icon {
+  width: 52px; height: 52px;
+  background: var(--foam);
+  border: 1px solid var(--mist);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px; font-size: 1.5rem;
+}
+.hc-title { font-size: .95rem; font-weight: 600; margin-bottom: 8px; }
+.hc-desc { font-size: .8rem; color: var(--stone); line-height: 1.55; margin-bottom: 18px; }
+
+.btn-cta-dark {
+  display: inline-block; padding: 10px 22px;
+  background: var(--ink); color: var(--paper);
+  border-radius: var(--r-sm); font-size: .85rem; font-weight: 600;
+  border: none; transition: background .2s, transform .12s;
+}
+.btn-cta-dark:hover { background: var(--pine); transform: translateY(-1px); }
+.btn-cta-outline {
+  display: inline-block; padding: 9px 22px;
+  background: transparent; color: var(--ink);
+  border: 1.5px solid rgba(0,0,0,0.15);
+  border-radius: var(--r-sm); font-size: .85rem; font-weight: 600;
+  transition: border-color .2s, background .2s, transform .12s;
+}
+.btn-cta-outline:hover { border-color: var(--pine); background: var(--foam); color: var(--pine); transform: translateY(-1px); }
+[data-theme="dark"] .btn-cta-outline { border-color: rgba(255,255,255,0.15); color: var(--charcoal); }
+
+/* ═══════════════════════════
+   HOW IT WORKS
+═══════════════════════════ */
+.section { padding: 96px 48px; }
+.section-label {
+  font-size: .7rem; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--pine); margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 700; letter-spacing: -1px; line-height: 1.15;
+}
+.section-sub { font-size: .95rem; color: var(--stone); margin-top: 10px; line-height: 1.6; }
+
+.how-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; margin-top: 56px;
+  background: var(--cloud); border-radius: var(--r-lg);
+  overflow: hidden; box-shadow: var(--sh-sm);
+}
+.how-step {
+  background: var(--white);
+  padding: 36px 30px;
+  position: relative;
+  transition: background .2s;
+}
+.how-step:hover { background: var(--foam); }
+[data-theme="dark"] .how-step { background: var(--white); }
+.how-num {
+  font-family: 'Fraunces', serif;
+  font-size: 3rem; font-weight: 900;
+  color: var(--mist); line-height: 1;
+  margin-bottom: 16px; letter-spacing: -2px;
+}
+[data-theme="dark"] .how-num { color: var(--mist); }
+.how-icon { font-size: 1.6rem; margin-bottom: 12px; }
+.how-step-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+.how-step-desc { font-size: .85rem; color: var(--stone); line-height: 1.6; }
+
+/* ═══════════════════════════
+   STATS STRIP
+═══════════════════════════ */
+.stats-strip {
+  background: var(--pine);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.stats-cell {
+  padding: 52px 40px; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  transition: background .2s;
+}
+.stats-cell:last-child { border-right: none; }
+.stats-cell:hover { background: rgba(255,255,255,0.05); }
+.stats-big {
+  font-family: 'Fraunces', serif;
+  font-size: 3.2rem; font-weight: 900;
+  color: #fff; line-height: 1; letter-spacing: -2px;
+}
+.stats-big span { color: var(--amber); }
+.stats-label { color: rgba(255,255,255,.55); font-size: .85rem; margin-top: 8px; }
+
+/* ═══════════════════════════
+   DASHBOARD BASE
+═══════════════════════════ */
+.dash {
+  display: none;
+  min-height: 100vh;
+  padding: calc(var(--nav-h) + 32px) 48px 60px;
+  max-width: 1120px; margin: 0 auto;
+}
+.dash.active { display: block; }
+
+.dash-topbar {
+  display: flex; align-items: flex-end;
+  justify-content: space-between; gap: 16px;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+.dash-heading { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+.dash-sub { font-size: .85rem; color: var(--stone); margin-top: 4px; }
+
+/* tabs */
+.tabs {
+  display: flex; gap: 2px;
+  background: var(--cloud);
+  padding: 3px; border-radius: var(--r-sm);
+}
+.tab-btn {
+  background: none; border: none;
+  padding: 8px 16px; border-radius: 6px;
+  font-size: .83rem; font-weight: 500; color: var(--stone);
+  transition: all .18s;
+}
+.tab-btn.on {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: var(--sh-sm);
+}
+
+/* kpi row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px; margin-bottom: 28px;
+}
+.kpi {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: var(--r-md); padding: 20px 18px;
+  box-shadow: var(--sh-sm);
+  transition: box-shadow .2s;
+}
+.kpi:hover { box-shadow: var(--sh-md); }
+[data-theme="dark"] .kpi { border-color: rgba(255,255,255,0.06); }
+.kpi-val {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem; font-weight: 700;
+  color: var(--pine); line-height: 1;
+}
+.kpi-name { font-size: .75rem; color: var(--stone); margin-top: 6px; }
+.kpi-delta { font-size: .72rem; color: var(--s-available); margin-top: 5px; font-weight: 500; }
+
+/* ═══════════════════════════
+   FOOD CARDS GRID
+═══════════════════════════ */
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  gap: 16px;
+}
+
+/* FOOD CARD */
+.fc {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--sh-sm);
+  transition: transform .22s, box-shadow .22s;
+}
+.fc:hover { transform: translateY(-4px); box-shadow: var(--sh-lg); }
+[data-theme="dark"] .fc { border-color: rgba(255,255,255,0.06); }
+
+.fc-thumb {
+  height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem;
+  position: relative;
+  /* section accent per status injected via JS */
+}
+/* donor section: soft green thumb */
+.fc-thumb.available { background: linear-gradient(135deg, #f0faf3, #d8f3dc); }
+.fc-thumb.claimed   { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+.fc-thumb.expired   { background: linear-gradient(135deg, #f9fafb, #f3f4f6); }
+[data-theme="dark"] .fc-thumb.available { background: linear-gradient(135deg, #0f2a1a, #1a3d2b); }
+[data-theme="dark"] .fc-thumb.claimed   { background: linear-gradient(135deg, #0f1729, #1a2540); }
+[data-theme="dark"] .fc-thumb.expired   { background: linear-gradient(135deg, #1a1a18, #222220); }
+
+.fc-body { padding: 16px; }
+.fc-name { font-size: .93rem; font-weight: 600; margin-bottom: 3px; }
+.fc-meta { font-size: .75rem; color: var(--stone); margin-bottom: 14px; line-height: 1.5; }
+.fc-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ═══════════════════════════
+   STATUS BADGES — COLOR PALETTE
+═══════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 99px;
+  font-size: .7rem; font-weight: 600; letter-spacing: .2px;
+}
+.badge::before {
+  content: ''; width: 5px; height: 5px;
+  border-radius: 50%; flex-shrink: 0;
+}
+/* Available — forest green */
+.badge.available {
+  background: var(--s-avail-bg);
+  color: var(--s-available);
+}
+.badge.available::before { background: var(--s-available); }
+
+/* Claimed — sky blue */
+.badge.claimed {
+  background: var(--s-claim-bg);
+  color: var(--s-claimed);
+}
+.badge.claimed::before { background: var(--s-claimed); }
+
+/* Expired — neutral grey */
+.badge.expired {
+  background: var(--s-expire-bg);
+  color: var(--s-expired);
+}
+.badge.expired::before { background: var(--s-expired); }
+
+/* ═══════════════════════════
+   ACTION BUTTON ON CARD
+═══════════════════════════ */
+.fc-btn {
+  padding: 7px 14px;
+  border: none; border-radius: var(--r-sm);
+  font-size: .76rem; font-weight: 600;
+  transition: background .15s, transform .12s;
+}
+.fc-btn.primary { background: var(--pine); color: #fff; }
+.fc-btn.primary:hover { background: var(--forest); transform: scale(1.04); }
+.fc-btn.muted { background: var(--cloud); color: var(--stone); }
+.fc-btn.muted:hover { background: var(--mist); color: var(--pine); }
+.fc-btn.outline-blue { background: var(--sky-soft); color: var(--s-claimed); }
+.fc-btn.outline-blue:hover { background: #dbeafe; }
+
+/* ═══════════════════════════
+   SKELETON
+═══════════════════════════ */
+.skel {
+  background: linear-gradient(90deg, var(--cloud) 25%, rgba(0,0,0,0.04) 50%, var(--cloud) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite;
+  border-radius: var(--r-sm);
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skel-card { background: var(--white); border: 1px solid rgba(0,0,0,0.05); border-radius: var(--r-lg); overflow: hidden; }
+.skel-top { height: 130px; }
+.skel-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.skel-line { height: 11px; }
+.skel-line.m { width: 65%; }
+.skel-line.s { width: 45%; }
+
+/* ═══════════════════════════
+   MAP BLOCK
+═══════════════════════════ */
+.map-block {
+  border-radius: var(--r-lg);
+  overflow: hidden; height: 320px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: var(--sh-sm);
+  position: relative;
+}
+.map-canvas {
+  height: 100%;
+  background:
+    linear-gradient(160deg, #c8e6c9 0%, #a5d6a7 50%, #81c784 100%);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+}
+.map-canvas::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.map-canvas::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.05);
+}
+.map-road {
+  position: absolute;
+  background: rgba(255,255,255,0.45);
+  border-radius: 4px;
+}
+.map-pin {
+  position: absolute; font-size: 2rem;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+  animation: pinbounce 2.5s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes pinbounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.map-pill {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  padding: 10px 20px; border-radius: 99px;
+  font-size: .82rem; font-weight: 600; color: var(--pine);
+  box-shadow: var(--sh-md); z-index: 3;
+  display: flex; align-items: center; gap: 7px;
+}
+.map-note { font-size: .73rem; color: rgba(0,0,0,0.5); z-index: 3; }
+
+/* ═══════════════════════════
+   MODALS
+═══════════════════════════ */
+.overlay {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .25s, visibility .25s;
+}
+.overlay.open { opacity: 1; visibility: visible; pointer-events: all; }
+.modal {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  width: 100%; max-width: 400px;
+  padding: 36px;
+  box-shadow: var(--sh-xl);
+  transform: translateY(20px) scale(0.97);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+.overlay.open .modal { transform: translateY(0) scale(1); }
+
+.modal-x {
+  position: absolute; top: 14px; right: 14px;
+  width: 30px; height: 30px; border-radius: var(--r-sm);
+  background: var(--cloud); border: none;
+  font-size: .85rem; color: var(--stone);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.modal-x:hover { background: var(--mist); color: var(--pine); }
+
+.modal-logo { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 900; color: var(--pine); }
+.modal-logo em { font-style: normal; color: var(--amber); }
+.modal-h { font-size: 1.3rem; font-weight: 700; letter-spacing: -.3px; margin: 6px 0 4px; }
+.modal-hint { font-size: .82rem; color: var(--stone); margin-bottom: 22px; }
+
+/* role pills */
+.role-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+.role-pill {
+  padding: 10px; border-radius: var(--r-sm);
+  border: 1.5px solid rgba(0,0,0,0.1);
+  background: none; font-size: .82rem; font-weight: 500;
+  color: var(--stone); transition: all .15s; text-align: center;
+}
+.role-pill.on { border-color: var(--pine); background: var(--foam); color: var(--pine); font-weight: 600; }
+.role-pill:hover { border-color: var(--sage); }
+
+/* form */
+.fg { margin-bottom: 14px; }
+.fl { display: block; font-size: .75rem; font-weight: 600; color: var(--charcoal); margin-bottom: 5px; }
+.fi {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius: var(--r-sm); font-size: .87rem;
+  font-family: 'Outfit', sans-serif;
+  background: var(--paper); color: var(--ink);
+  outline: none;
+  transition: border-color .18s, box-shadow .18s;
+}
+.fi:focus { border-color: var(--pine); box-shadow: 0 0 0 3px rgba(45,106,79,0.12); }
+[data-theme="dark"] .fi { background: var(--cloud); }
+.fr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.btn-submit {
+  width: 100%; padding: 12px;
+  background: var(--pine); color: #fff;
+  border: none; border-radius: var(--r-sm);
+  font-size: .9rem; font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  margin-top: 6px;
+  transition: background .15s, transform .12s;
+}
+.btn-submit:hover { background: var(--forest); transform: translateY(-1px); }
+
+.modal-or { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+.modal-or span { flex: 1; height: 1px; background: var(--cloud); }
+.modal-or p { font-size: .75rem; color: var(--pebble); }
+.btn-google {
+  width: 100%; padding: 10px; border-radius: var(--r-sm);
+  border: 1.5px solid rgba(0,0,0,0.1); background: none;
+  font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 500;
+  color: var(--charcoal);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s, border-color .15s;
+}
+.btn-google:hover { background: var(--cloud); border-color: var(--pebble); }
+[data-theme="dark"] .btn-google { border-color: rgba(255,255,255,0.1); color: var(--charcoal); }
+.modal-switch { text-align: center; font-size: .8rem; color: var(--stone); margin-top: 14px; }
+.modal-switch a { color: var(--pine); font-weight: 600; cursor: pointer; }
+.modal-switch a:hover { text-decoration: underline; }
+
+/* ═══════════════════════════
+   TOAST
+═══════════════════════════ */
+.toasts {
+  position: fixed; bottom: 24px; right: 24px;
+  z-index: 9000; display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--ink); color: #fff;
+  padding: 12px 16px; border-radius: var(--r-md);
+  font-size: .8rem; font-weight: 500;
+  box-shadow: var(--sh-lg);
+  display: flex; align-items: center; gap: 10px;
+  pointer-events: all;
+  transform: translateX(110%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  max-width: 280px;
+}
+.toast.in { transform: translateX(0); }
+.toast-body strong { display: block; font-size: .83rem; margin-bottom: 1px; }
+.toast-body span { opacity: .65; font-size: .75rem; }
+
+/* ═══════════════════════════
+   FOOTER
+═══════════════════════════ */
+.footer {
+  background: var(--ink);
+  color: rgba(255,255,255,.35);
+  text-align: center; padding: 28px 24px;
+  font-size: .8rem;
+}
+.footer a { color: var(--sage); }
+
+/* ═══════════════════════════
+   RESPONSIVE
+═══════════════════════════ */
+@media (max-width: 768px) {
+  .nav { padding: 0 20px; }
+  .nav-links, .nav-divider { display: none; }
+  .ham-btn { display: flex; }
+  .btn-ghost { display: none; }
+
+  .hero { padding: calc(var(--nav-h) + 24px) 20px 48px; }
+  .section { padding: 60px 24px; }
+  .stats-strip { grid-template-columns: 1fr; }
+  .stats-cell { border-right: none; border-bottom: 1px solid rgba(255,255,255,.1); padding: 36px 24px; }
+  .how-grid { grid-template-columns: 1fr; }
+  .dash { padding: calc(var(--nav-h) + 16px) 20px 40px; }
+  .dash-topbar { flex-direction: column; align-items: flex-start; }
+  .fr { grid-template-columns: 1fr; }
+  .modal { padding: 28px 22px; }
+}
+@media (max-width: 480px) {
+  .hero-cards { flex-direction: column; align-items: center; }
+  .hero-card { width: 100%; max-width: 320px; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <div class="logo">Food<span>Rescue</span></div>
-    <div class="nav-links">
-      <a href="#how">How It Works</a>
-      <a href="#browse">Browse Foods</a>
-      <button class="btn-signin">Sign In</button>
-    </div>
-  </nav>
+<!-- ══ LOADER ══ -->
+<div id="loader">
+  <div class="ld-logo">Food<em>Rescue</em></div>
+  <div class="ld-track"><div class="ld-bar"></div></div>
+  <div class="ld-hint">Loading...</div>
+</div>
 
-  <!-- HERO -->
+<!-- ══ NAVBAR ══ -->
+<nav class="nav" id="nav">
+  <div class="nav-logo" onclick="showHome()">
+    <div class="nav-logo-icon">🌿</div>
+    Food<em>Rescue</em>
+  </div>
+
+  <div class="nav-spacer"></div>
+
+  <div class="nav-links" id="navLinks">
+    <button class="nav-link active" id="nlHome"      onclick="showHome()">Home</button>
+    <button class="nav-link"        id="nlDonor"     onclick="showDash('donor')">Donor Dashboard</button>
+    <button class="nav-link"        id="nlRecipient" onclick="showDash('recipient')">Browse Food</button>
+  </div>
+
+  <div class="nav-actions">
+    <div class="notif-wrap">
+      <button class="notif-trigger" onclick="toggleNotif()" title="Notifications">
+        🔔
+        <span class="notif-dot" id="notifDot"></span>
+      </button>
+      <div class="notif-panel" id="notifPanel">
+        <div class="np-header">
+          <span class="np-title">Notifications</span>
+          <button class="np-clear" onclick="clearNotifs()">Mark all read</button>
+        </div>
+        <div class="np-item"><div class="np-pip green"></div><div><div class="np-msg">New listing near you — <strong>Homemade Biryani</strong> in Andheri</div><div class="np-time">2 min ago</div></div></div>
+        <div class="np-item"><div class="np-pip amber"></div><div><div class="np-msg">Your claim for <strong>Veg Thali</strong> is confirmed ✓</div><div class="np-time">1 hour ago</div></div></div>
+        <div class="np-item"><div class="np-pip grey"></div><div><div class="np-msg"><strong>Bread & Pastries</strong> listing has expired</div><div class="np-time">3 hours ago</div></div></div>
+        <div class="np-item"><div class="np-pip green"></div><div><div class="np-msg">🌿 You've rescued <strong>12 meals</strong> this month!</div><div class="np-time">Yesterday</div></div></div>
+      </div>
+    </div>
+
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle dark mode" id="themeBtn">🌙</button>
+    <div class="nav-divider"></div>
+    <button class="btn-ghost" onclick="openModal('login')">Sign in</button>
+    <button class="btn-solid" onclick="openModal('signup')">Sign up free</button>
+    <button class="ham-btn" id="hamBtn" onclick="toggleMobile()">
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-link" onclick="showHome();toggleMobile()">Home</button>
+  <button class="mobile-link" onclick="showDash('donor');toggleMobile()">Donor Dashboard</button>
+  <button class="mobile-link" onclick="showDash('recipient');toggleMobile()">Browse Food</button>
+  <div class="mobile-divider"></div>
+  <div class="mobile-actions">
+    <button class="btn-ghost" style="flex:1;padding:10px" onclick="openModal('login');toggleMobile()">Sign in</button>
+    <button class="btn-solid" style="flex:1;padding:10px" onclick="openModal('signup');toggleMobile()">Sign up</button>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="homeView">
   <section class="hero">
-    <span class="hero-badge">✦ Fighting food waste, one meal at a time</span>
-    <h1>Rescue Food,<br/><em>Feed Hope</em></h1>
-    <p>Connect surplus food with those who need it most. Join our community of donors and recipients making a real difference in fighting food waste.</p>
-
-    <div class="cards">
-      <!-- Donor Card -->
-      <div class="card">
-        <div class="card-icon">🌾</div>
-        <h3>Food Donors</h3>
-        <p>Have surplus food? Share it with those in need and reduce waste in your community.</p>
-        <a href="#" class="btn-primary">Become a Donor</a>
+    <div class="hero-eyebrow">🌿 Fighting food waste · Mumbai</div>
+    <h1 class="hero-h1">Rescue Food,<br/><em>Feed Hope</em></h1>
+    <p class="hero-desc">Connect surplus food with those who need it most. Join thousands of donors and recipients making a real difference every day.</p>
+    <div class="hero-cards">
+      <div class="hero-card" onclick="showDash('donor')">
+        <div class="hc-icon">🌾</div>
+        <div class="hc-title">Food Donors</div>
+        <p class="hc-desc">Have surplus food? Share it with those in need and reduce waste in your community.</p>
+        <span class="btn-cta-dark" onclick="event.stopPropagation();openModal('signup')">Become a Donor</span>
       </div>
-
-      <!-- Recipient Card -->
-      <div class="card">
-        <div class="card-icon">🫶🏽</div>
-        <h3>Food Recipients</h3>
-        <p>Looking for food assistance? Browse available items listed by donors near you.</p>
-        <a href="#" class="btn-outline">Register as Recipient</a>
+      <div class="hero-card" onclick="showDash('recipient')">
+        <div class="hc-icon">🫶🏽</div>
+        <div class="hc-title">Food Recipients</div>
+        <p class="hc-desc">Looking for food assistance? Browse available items listed by generous donors near you.</p>
+        <span class="btn-cta-outline" onclick="event.stopPropagation();openModal('signup')">Register as Recipient</span>
       </div>
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
-  <section class="how" id="how">
-    <p class="section-tag">Simple process</p>
-    <h2>How It Works</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h4>Sign Up</h4>
-        <p>Create your free account as a donor or recipient in minutes.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h4>Connect</h4>
-        <p>Browse available food listings or post your surplus for others to claim.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h4>Share</h4>
-        <p>Arrange a pickup or drop-off and make someone's day a little brighter.</p>
+  <!-- How It Works -->
+  <section class="section" style="background:var(--paper)">
+    <div style="max-width:900px;margin:0 auto">
+      <div class="section-label">Simple process</div>
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-sub">Three easy steps to start making a difference.</p>
+      <div class="how-grid">
+        <div class="how-step">
+          <div class="how-num">01</div>
+          <div class="how-icon">✍🏽</div>
+          <div class="how-step-title">Sign Up</div>
+          <p class="how-step-desc">Create your free account as a donor or recipient. Takes less than 2 minutes.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-num">02</div>
+          <div class="how-icon">🔗</div>
+          <div class="how-step-title">Connect</div>
+          <p class="how-step-desc">Browse available food listings or post your surplus for others to discover and claim.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-num">03</div>
+          <div class="how-icon">🤝🏽</div>
+          <div class="how-step-title">Share</div>
+          <p class="how-step-desc">Arrange a convenient pickup or drop-off and make someone's day a little better.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- STATS -->
-  <section class="stats">
-    <div class="stat">
-      <div class="stat-num">2<span>K+</span></div>
-      <div class="stat-label">Meals Rescued</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">450<span>+</span></div>
-      <div class="stat-label">Active Donors</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">120<span>+</span></div>
-      <div class="stat-label">Communities Served</div>
-    </div>
-  </section>
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stats-cell"><div class="stats-big">2<span>K+</span></div><div class="stats-label">Meals Rescued</div></div>
+    <div class="stats-cell"><div class="stats-big">450<span>+</span></div><div class="stats-label">Active Donors</div></div>
+    <div class="stats-cell"><div class="stats-big">120<span>+</span></div><div class="stats-label">Communities Served</div></div>
+  </div>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2025 FoodRescue. Made with 🌿 to fight hunger and food waste. &nbsp;|&nbsp; <a href="#">Privacy</a> &nbsp;|&nbsp; <a href="#">Terms</a></p>
-  </footer>
+  <footer class="footer"><p>© 2025 FoodRescue. Made with 🌿 to fight hunger. &nbsp;|&nbsp; <a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a></p></footer>
+</div>
 
+<!-- ══ DONOR DASHBOARD ══ -->
+<div class="dash" id="donorDash">
+  <div class="dash-topbar">
+    <div>
+      <div class="dash-heading">Donor Dashboard</div>
+      <div class="dash-sub">Track your listings and impact</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn on" onclick="dTab(this,'dL')">My Listings</button>
+      <button class="tab-btn"    onclick="dTab(this,'dM')">Map View</button>
+      <button class="tab-btn"    onclick="dTab(this,'dI')">Impact</button>
+    </div>
+  </div>
+
+  <div id="dL">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val">12</div><div class="kpi-name">Total Listings</div><div class="kpi-delta">↑ 3 this week</div></div>
+      <div class="kpi"><div class="kpi-val">8</div><div class="kpi-name">Meals Claimed</div><div class="kpi-delta">↑ 2 today</div></div>
+      <div class="kpi"><div class="kpi-val">4</div><div class="kpi-name">Available Now</div><div class="kpi-delta">Active listings</div></div>
+      <div class="kpi"><div class="kpi-val">94%</div><div class="kpi-name">Claim Rate</div><div class="kpi-delta">↑ Excellent!</div></div>
+    </div>
+    <div class="food-grid" id="donorGrid"></div>
+  </div>
+
+  <div id="dM" style="display:none">
+    <div class="map-block">
+      <div class="map-canvas">
+        <!-- roads -->
+        <div class="map-road" style="width:70%;height:6px;top:45%;left:5%"></div>
+        <div class="map-road" style="width:6px;height:60%;top:15%;left:38%"></div>
+        <!-- pins -->
+        <div class="map-pin" style="top:28%;left:22%;animation-delay:0s">📍</div>
+        <div class="map-pin" style="top:52%;left:55%;animation-delay:.5s">📍</div>
+        <div class="map-pin" style="top:20%;left:66%;animation-delay:1s">📍</div>
+        <div class="map-pin" style="top:64%;left:36%;animation-delay:1.5s">📍</div>
+        <div class="map-pill">🗺️ Your listings · Mumbai</div>
+        <div class="map-note">Connect Mapbox or Google Maps for live data</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dI" style="display:none">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val">47</div><div class="kpi-name">Total Meals Donated</div><div class="kpi-delta">All time</div></div>
+      <div class="kpi"><div class="kpi-val">12</div><div class="kpi-name">Families Helped</div><div class="kpi-delta">This month</div></div>
+      <div class="kpi"><div class="kpi-val">23kg</div><div class="kpi-name">Food Saved from Landfill</div><div class="kpi-delta">Eco impact</div></div>
+    </div>
+    <div style="background:var(--white);border:1px solid rgba(0,0,0,0.06);border-radius:var(--r-lg);padding:36px;box-shadow:var(--sh-sm);text-align:center;margin-top:4px">
+      <div style="font-size:3rem;margin-bottom:14px">🏆</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;margin-bottom:8px">Top Donor Badge</div>
+      <div style="font-size:.88rem;color:var(--stone)">You're in the top 10% of donors this month in Mumbai. Keep going!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RECIPIENT DASHBOARD ══ -->
+<div class="dash" id="recipientDash">
+  <div class="dash-topbar">
+    <div>
+      <div class="dash-heading">Browse Food</div>
+      <div class="dash-sub">Available food near you</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn on" onclick="rTab(this,'rL')">Available Food</button>
+      <button class="tab-btn"    onclick="rTab(this,'rM')">Map View</button>
+      <button class="tab-btn"    onclick="rTab(this,'rC')">My Claims</button>
+    </div>
+  </div>
+
+  <div id="rL"><div class="food-grid" id="recipientGrid"></div></div>
+
+  <div id="rM" style="display:none">
+    <div class="map-block">
+      <div class="map-canvas">
+        <div class="map-road" style="width:65%;height:6px;top:50%;left:8%"></div>
+        <div class="map-road" style="width:6px;height:55%;top:20%;left:45%"></div>
+        <div class="map-pin" style="top:32%;left:28%;animation-delay:0s">🟢</div>
+        <div class="map-pin" style="top:55%;left:60%;animation-delay:.6s">🟢</div>
+        <div class="map-pin" style="top:22%;left:68%;animation-delay:1.1s">🟡</div>
+        <div class="map-pin" style="top:66%;left:40%;animation-delay:1.6s">⚫</div>
+        <div class="map-pill">🗺️ Food available near you</div>
+        <div class="map-note">🟢 Available &nbsp;·&nbsp; 🟡 Claimed &nbsp;·&nbsp; ⚫ Expired</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="rC" style="display:none">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val">5</div><div class="kpi-name">Total Claims</div></div>
+      <div class="kpi"><div class="kpi-val">3</div><div class="kpi-name">Picked Up</div></div>
+      <div class="kpi"><div class="kpi-val">2</div><div class="kpi-name">Pending</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGIN MODAL ══ -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal('loginOverlay')">✕</button>
+    <div class="modal-logo">Food<em>Rescue</em></div>
+    <h2 class="modal-h">Welcome back</h2>
+    <p class="modal-hint">Sign in to your account to continue</p>
+    <div class="fg"><label class="fl">Email address</label><input type="email" class="fi" placeholder="you@example.com"/></div>
+    <div class="fg"><label class="fl">Password</label><input type="password" class="fi" placeholder="••••••••"/></div>
+    <button class="btn-submit" onclick="doLogin()">Sign in →</button>
+    <div class="modal-or"><span></span><p>or</p><span></span></div>
+    <button class="btn-google">🌐 &nbsp; Continue with Google</button>
+    <div class="modal-switch">No account? <a onclick="switchModal('loginOverlay','signupOverlay')">Sign up free</a></div>
+  </div>
+</div>
+
+<!-- ══ SIGNUP MODAL ══ -->
+<div class="overlay" id="signupOverlay">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal('signupOverlay')">✕</button>
+    <div class="modal-logo">Food<em>Rescue</em></div>
+    <h2 class="modal-h">Create your account</h2>
+    <p class="modal-hint">Join the community making a real difference</p>
+    <p class="fl" style="margin-bottom:8px">I want to join as</p>
+    <div class="role-row">
+      <button class="role-pill on" id="rpDonor"     onclick="setRole('donor')">🌾 Food Donor</button>
+      <button class="role-pill"   id="rpRecipient"  onclick="setRole('recipient')">🫶🏽 Recipient</button>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">First name</label><input type="text" class="fi" placeholder="Mrunali"/></div>
+      <div class="fg"><label class="fl">Last name</label><input type="text" class="fi" placeholder="Shah"/></div>
+    </div>
+    <div class="fg"><label class="fl">Email address</label><input type="email" class="fi" placeholder="you@example.com"/></div>
+    <div class="fg"><label class="fl">Password</label><input type="password" class="fi" placeholder="Minimum 8 characters"/></div>
+    <button class="btn-submit" onclick="doSignup()">Create Account →</button>
+    <div class="modal-or"><span></span><p>or</p><span></span></div>
+    <button class="btn-google">🌐 &nbsp; Sign up with Google</button>
+    <div class="modal-switch">Already have an account? <a onclick="switchModal('signupOverlay','loginOverlay')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ══ TOASTS ══ -->
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ── DATA ── */
+const DONOR_DATA = [
+  { e:'🍛', n:'Homemade Biryani',  m:'Andheri West · Expires in 3h', s:'available', a:'Edit'   },
+  { e:'🥗', n:'Fresh Salad Bowl',  m:'Bandra · Expires in 5h',       s:'available', a:'Edit'   },
+  { e:'🍞', n:'Bread & Pastries',  m:'Juhu · Expired 2h ago',        s:'expired',   a:'Relist' },
+  { e:'🍱', n:'Veg Thali × 4',    m:'Malad · Claimed 1h ago',       s:'claimed',   a:'View'   },
+];
+const RECIP_DATA = [
+  { e:'🍛', n:'Homemade Biryani',  m:'Andheri West · 1.2 km',        s:'available', a:'Claim'  },
+  { e:'🥘', n:'Dal & Rice',        m:'Bandra · 2.4 km',               s:'available', a:'Claim'  },
+  { e:'🍞', n:'Bread & Pastries',  m:'Juhu · Expired',                s:'expired',   a:''       },
+  { e:'🥗', n:'Fresh Salad Bowl',  m:'Kurla · 3.1 km',                s:'available', a:'Claim'  },
+  { e:'🍱', n:'Veg Thali × 4',    m:'Malad · Just claimed',          s:'claimed',   a:''       },
+  { e:'🍜', n:'Noodles & Soup',    m:'Goregaon · 4.5 km',            s:'available', a:'Claim'  },
+];
+
+/* ── RENDER GRID ── */
+function renderGrid(data, id, skel = false) {
+  const el = document.getElementById(id);
+  if (skel) {
+    el.innerHTML = Array(4).fill(`
+      <div class="skel-card">
+        <div class="skel skel-top"></div>
+        <div class="skel-body">
+          <div class="skel skel-line"></div>
+          <div class="skel skel-line m"></div>
+          <div class="skel skel-line s"></div>
+        </div>
+      </div>`).join('');
+    setTimeout(() => renderGrid(data, id), 1100);
+    return;
+  }
+
+  const actionClass = a => {
+    if (a === 'Claim' || a === 'Edit') return 'primary';
+    if (a === 'View') return 'outline-blue';
+    if (a === 'Relist') return 'muted';
+    return 'muted';
+  };
+
+  el.innerHTML = data.map(f => `
+    <div class="fc">
+      <div class="fc-thumb ${f.s}">${f.e}</div>
+      <div class="fc-body">
+        <div class="fc-name">${f.n}</div>
+        <div class="fc-meta">${f.m}</div>
+        <div class="fc-foot">
+          <span class="badge ${f.s}">${f.s.charAt(0).toUpperCase() + f.s.slice(1)}</span>
+          ${f.a ? `<button class="fc-btn ${actionClass(f.a)}" onclick="doAction('${f.a}','${f.n}')">${f.a}</button>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── NAV STATE ── */
+function setNavActive(id) {
+  ['nlHome','nlDonor','nlRecipient'].forEach(i => {
+    document.getElementById(i)?.classList.remove('active');
+  });
+  if (id) document.getElementById(id)?.classList.add('active');
+}
+
+function showHome() {
+  document.getElementById('homeView').style.display = 'block';
+  document.getElementById('donorDash').classList.remove('active');
+  document.getElementById('recipientDash').classList.remove('active');
+  setNavActive('nlHome');
+  closeNotif();
+}
+
+function showDash(type) {
+  document.getElementById('homeView').style.display = 'none';
+  if (type === 'donor') {
+    document.getElementById('donorDash').classList.add('active');
+    document.getElementById('recipientDash').classList.remove('active');
+    renderGrid(DONOR_DATA, 'donorGrid', true);
+    setNavActive('nlDonor');
+  } else {
+    document.getElementById('recipientDash').classList.add('active');
+    document.getElementById('donorDash').classList.remove('active');
+    renderGrid(RECIP_DATA, 'recipientGrid', true);
+    setNavActive('nlRecipient');
+  }
+  closeNotif();
+}
+
+/* ── TABS ── */
+const dTabs = ['dL','dM','dI'];
+const rTabs = ['rL','rM','rC'];
+function dTab(btn, id) {
+  btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  dTabs.forEach(t => { const el = document.getElementById(t); if(el) el.style.display = 'none'; });
+  document.getElementById(id).style.display = 'block';
+}
+function rTab(btn, id) {
+  btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  rTabs.forEach(t => { const el = document.getElementById(t); if(el) el.style.display = 'none'; });
+  document.getElementById(id).style.display = 'block';
+}
+
+/* ── MODALS ── */
+function openModal(type) {
+  document.getElementById(type === 'login' ? 'loginOverlay' : 'signupOverlay').classList.add('open');
+  closeNotif();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function switchModal(from, to) { closeModal(from); setTimeout(() => document.getElementById(to).classList.add('open'), 160); }
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+function setRole(r) {
+  document.getElementById('rpDonor').classList.toggle('on', r === 'donor');
+  document.getElementById('rpRecipient').classList.toggle('on', r === 'recipient');
+}
+
+/* ── AUTH ── */
+function doLogin()  { closeModal('loginOverlay');  toast('👋', 'Welcome back!', 'Signed in successfully'); showDash('donor'); }
+function doSignup() { closeModal('signupOverlay'); toast('🌿', 'Account created!', 'Welcome to FoodRescue'); showDash('donor'); }
+function doAction(a, n) {
+  if (a === 'Claim')  toast('🎉', 'Claimed!',  `${n} has been reserved for you`);
+  if (a === 'Edit')   toast('✏️', 'Edit mode', `Editing "${n}"`);
+  if (a === 'Relist') toast('🔄', 'Relisted',  `"${n}" is live again`);
+  if (a === 'View')   toast('👁', 'Claim info', `Viewing details for "${n}"`);
+}
+
+/* ── NOTIFICATIONS ── */
+function toggleNotif() { document.getElementById('notifPanel').classList.toggle('open'); }
+function closeNotif()  { document.getElementById('notifPanel').classList.remove('open'); }
+function clearNotifs() {
+  document.querySelectorAll('.np-pip').forEach(d => d.style.background = 'var(--pebble)');
+  document.getElementById('notifDot').style.display = 'none';
+  toast('✓', 'All clear', 'Notifications marked as read');
+  closeNotif();
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.notif-wrap')) closeNotif();
+});
+
+/* ── THEME ── */
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+}
+
+/* ── MOBILE MENU ── */
+function toggleMobile() {
+  const btn  = document.getElementById('hamBtn');
+  const menu = document.getElementById('mobileMenu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
+}
+
+/* ── TOAST ── */
+function toast(icon, title, msg) {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span style="font-size:1.1rem">${icon}</span><div class="toast-body"><strong>${title}</strong><span>${msg}</span></div>`;
+  c.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('in')));
+  setTimeout(() => { t.classList.remove('in'); setTimeout(() => t.remove(), 350); }, 3200);
+}
+
+/* ── LOADER ── */
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('gone'), 1700);
+});
+</script>
 </body>
 </html>
