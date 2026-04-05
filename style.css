@@ -1,8 +1,8 @@
-/* Fonts */
+/* Base */
 body {
   font-family: 'Nunito', sans-serif;
   margin: 0;
-  background: #fffbea;
+  background: #ffffff;
   color: #333;
 }
 
@@ -12,13 +12,13 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: #fdf6d9;
+  background: #fff;
   border-bottom: 2px solid #d4e09b;
 }
 .logo {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: #2a7a2a;
 }
 .logo span {
@@ -51,7 +51,7 @@ button {
   color: #fff;
 }
 .btn-signin {
-  background: #fdf6d9;
+  background: #fff;
   border: 1px solid #2a7a2a;
   color: #2a7a2a;
 }
@@ -64,6 +64,7 @@ button {
 .hero {
   text-align: center;
   padding: 4rem 2rem;
+  background: #fffbea;
 }
 .hero-badge {
   display: inline-block;
@@ -106,9 +107,6 @@ button {
   font-size: 2rem;
   margin-bottom: 0.5rem;
 }
-.card h3 {
-  margin: 0.5rem 0;
-}
 .card-btns {
   margin-top: 1rem;
   display: flex;
@@ -139,18 +137,24 @@ button {
 .how {
   text-align: center;
   padding: 4rem 2rem;
+  background: #fff;
 }
 .section-tag {
   text-transform: uppercase;
   font-size: 0.9rem;
   color: #2a7a2a;
   font-weight: 700;
+  letter-spacing: 1px;
+}
+.how h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  margin: 0.5rem 0 2rem;
 }
 .steps {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin-top: 2rem;
   flex-wrap: wrap;
 }
 .step {
@@ -198,7 +202,7 @@ button {
 footer {
   text-align: center;
   padding: 1rem;
-  background: #fdf6d9;
+  background: #fff;
   font-size: 0.9rem;
 }
 footer a {
@@ -215,13 +219,7 @@ body.dark nav {
   background: #333;
   border-color: #555;
 }
-body.dark .logo span {
-  color: #ff6b6b;
-}
-body.dark .card {
-  background: #2a2a2a;
-  border-color: #555;
-}
+body.dark .card,
 body.dark .step {
   background: #2a2a2a;
   border-color: #555;
