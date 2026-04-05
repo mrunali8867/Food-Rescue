@@ -1,89 +1,273 @@
-// script.js — Food Rescue (enhanced)
-// Dark mode persistence, button handlers, smooth scroll, accessibility checks
+/* style.css — Food Rescue
+   Responsive layout, cards, nav, hero, stats, footer, dark mode
+*/
 
-// Utility: safe query
-function $(selector){ return document.querySelector(selector); }
-function $all(selector){ return Array.from(document.querySelectorAll(selector)); }
-
-// ---------- Dark mode toggle with persistence ----------
-const darkToggle = $('#darkToggle');
-if (darkToggle) {
-  // initialize from localStorage
-  const saved = localStorage.getItem('foodrescue:dark');
-  if (saved === 'true') document.body.classList.add('dark');
-
-  // update icon on load
-  darkToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-
-  darkToggle.addEventListener('click', function () {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    this.textContent = isDark ? '☀️' : '🌙';
-    localStorage.setItem('foodrescue:dark', isDark ? 'true' : 'false');
-    this.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-  });
+/* ---------- Base / Typography ---------- */
+:root{
+  --bg: #ffffff;
+  --surface: #fbfbfb;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #16a34a;
+  --accent-600: #15803d;
+  --card: #ffffff;
+  --glass: rgba(255,255,255,0.6);
+  --shadow: 0 6px 18px rgba(15,23,42,0.08);
+  --radius: 12px;
 }
 
-// ---------- Sign In / Sign Up / Donate placeholders ----------
-const btnSignIn = $('#btnSignIn');
-const btnSignUp = $('#btnSignUp');
-const btnDonate = $('#btnDonate');
-
-if (btnSignIn) {
-  btnSignIn.addEventListener('click', function () {
-    // TODO: Replace with real auth flow (Supabase / Firebase / custom)
-    alert('Sign In clicked!\nTODO: Connect to Supabase auth.');
-  });
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color:var(--text);
+  background:linear-gradient(180deg, var(--bg) 0%, #f7fafc 100%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.5;
+  -webkit-tap-highlight-color: transparent;
 }
 
-if (btnSignUp) {
-  btnSignUp.addEventListener('click', function () {
-    // TODO: Replace with real signup flow
-    alert('Sign Up clicked!\nTODO: Connect to Supabase signup.');
-  });
+/* ---------- Dark mode ---------- */
+body.dark{
+  --bg: #0b1220;
+  --surface: #071022;
+  --text: #e6eef6;
+  --muted: #9aa9bf;
+  --accent: #34d399;
+  --accent-600: #10b981;
+  --card: #071428;
+  --glass: rgba(255,255,255,0.03);
+  --shadow: 0 8px 24px rgba(2,6,23,0.6);
+  background: linear-gradient(180deg, #071022 0%, #04101a 100%);
 }
 
-if (btnDonate) {
-  btnDonate.addEventListener('click', function () {
-    // TODO: Replace with donation flow / payment integration
-    alert('Donate Now clicked!\nTODO: Add your donation flow here.');
-  });
+/* ---------- Layout / Nav ---------- */
+nav{
+  position:sticky;
+  top:0;
+  z-index:40;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 28px;
+  backdrop-filter: blur(6px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));
+  box-shadow: var(--shadow);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
-// ---------- Smooth scroll for anchor links ----------
-$all('.nav-links a').forEach(function (link) {
-  link.addEventListener('click', function (e) {
-    const href = this.getAttribute('href');
-    if (href && href.startsWith('#')) {
-      const target = document.querySelector(href);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // update focus for accessibility
-        target.setAttribute('tabindex', '-1');
-        target.focus({ preventScroll: true });
-      }
-    }
-  });
-});
+body.dark nav{
+  background: linear-gradient(180deg, rgba(7,20,34,0.6), rgba(7,20,34,0.35));
+}
 
-// ---------- Small accessibility improvements ----------
-document.addEventListener('keydown', function (e) {
-  // allow Esc to close any open modals in future (placeholder)
-  if (e.key === 'Escape') {
-    // closeModal(); // implement if you add modals
-  }
-});
+.logo{
+  font-family: "Cormorant Garamond", serif;
+  font-weight:700;
+  font-size:1.35rem;
+  color:var(--text);
+}
+.logo span{ color:var(--accent); margin-left:4px; font-weight:700; }
 
-// ---------- Defensive DOM-ready wrapper ----------
-(function waitForDOM() {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', waitForDOM);
-    return;
-  }
-  // DOM ready — ensure nav buttons have aria labels
-  if (btnSignIn) btnSignIn.setAttribute('aria-label', 'Sign in');
-  if (btnSignUp) btnSignUp.setAttribute('aria-label', 'Sign up');
-  if (btnDonate) btnDonate.setAttribute('aria-label', 'Donate now');
-  if (darkToggle) darkToggle.setAttribute('aria-label', 'Toggle dark mode');
-})();
+/* nav links */
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.nav-links a{
+  color:var(--text);
+  text-decoration:none;
+  font-weight:600;
+  padding:8px 10px;
+  border-radius:8px;
+  transition:all .18s ease;
+}
+.nav-links a:hover{ background:var(--glass); transform:translateY(-1px); }
+
+button{
+  font-family:inherit;
+  cursor:pointer;
+  border:0;
+  padding:8px 12px;
+  border-radius:10px;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+button:active{ transform:translateY(1px); }
+
+.btn-donate{
+  background: linear-gradient(90deg,var(--accent),var(--accent-600));
+  color:white;
+  font-weight:700;
+  box-shadow: 0 6px 18px rgba(16,185,129,0.12);
+}
+.btn-signup-nav{
+  background:transparent;
+  color:var(--text);
+  border:1px solid rgba(0,0,0,0.06);
+  padding:8px 14px;
+}
+.btn-signin{
+  background:transparent;
+  color:var(--text);
+  padding:8px 12px;
+}
+.btn-dark-toggle{
+  background:transparent;
+  font-size:1.05rem;
+}
+
+/* ---------- Hero ---------- */
+.hero{
+  max-width:1100px;
+  margin:36px auto;
+  padding:36px;
+  display:block;
+  text-align:left;
+}
+.hero-badge{
+  display:inline-block;
+  background:var(--glass);
+  color:var(--accent-600);
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:700;
+  margin-bottom:18px;
+  font-size:0.95rem;
+}
+.hero h1{
+  font-family: "Cormorant Garamond", serif;
+  font-size:3.2rem;
+  margin:8px 0 12px 0;
+  line-height:1.02;
+  color:var(--text);
+}
+.hero h1 em{ color:var(--accent); font-style:normal; font-weight:700; }
+
+.hero p{
+  color:var(--muted);
+  max-width:720px;
+  margin-bottom:22px;
+  font-size:1.05rem;
+}
+
+/* ---------- Cards ---------- */
+.cards{
+  display:flex;
+  gap:18px;
+  margin-top:18px;
+  flex-wrap:wrap;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:18px;
+  width:320px;
+  box-shadow:var(--shadow);
+  border:1px solid rgba(0,0,0,0.03);
+}
+.card-icon{
+  font-size:28px;
+  width:56px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.01));
+  margin-bottom:12px;
+}
+.card h3{ margin:0 0 8px 0; font-size:1.15rem; }
+.card p{ color:var(--muted); margin:0 0 14px 0; font-size:0.95rem; }
+
+.card-btns{ display:flex; gap:10px; }
+.btn-primary{
+  background:linear-gradient(90deg,var(--accent),var(--accent-600));
+  color:white;
+  padding:10px 12px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:700;
+}
+.btn-outline{
+  border:1px solid rgba(0,0,0,0.08);
+  padding:10px 12px;
+  border-radius:10px;
+  text-decoration:none;
+  color:var(--text);
+}
+.btn-learn{
+  margin-left:auto;
+  color:var(--accent-600);
+  text-decoration:none;
+  align-self:center;
+  font-weight:700;
+}
+
+/* ---------- How It Works / Steps ---------- */
+.how{ max-width:1100px; margin:36px auto; padding:28px; }
+.section-tag{ color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+.how h2{ font-family:"Cormorant Garamond", serif; font-size:1.9rem; margin:8px 0 18px 0; }
+
+.steps{ display:flex; gap:18px; flex-wrap:wrap; }
+.step{
+  background:var(--surface);
+  padding:18px;
+  border-radius:12px;
+  flex:1 1 220px;
+  min-width:220px;
+  box-shadow:var(--shadow);
+}
+.step-num{
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  background:var(--accent);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+/* ---------- Stats ---------- */
+.stats{
+  max-width:1100px;
+  margin:28px auto;
+  display:flex;
+  gap:18px;
+  justify-content:space-between;
+  padding:18px;
+  flex-wrap:wrap;
+}
+.stat{
+  background:var(--card);
+  padding:18px;
+  border-radius:12px;
+  flex:1 1 180px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.stat-num{ font-size:1.6rem; font-weight:800; color:var(--accent); }
+.stat-label{ color:var(--muted); margin-top:6px; }
+
+/* ---------- Footer ---------- */
+footer{
+  margin-top:36px;
+  padding:22px;
+  text-align:center;
+  color:var(--muted);
+  font-size:0.95rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px){
+  .hero h1{ font-size:2.4rem; }
+  nav{ padding:12px 16px; }
+  .nav-links{ gap:8px; }
+  .cards{ justify-content:center; }
+  .nav-links a{ display:none; } /* simplify nav on small screens */
+}
