@@ -413,3 +413,178 @@ footer a:hover { color: #fff; }
   .steps { flex-direction: column; align-items: center; gap: 32px; }
   .stats { gap: 40px; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   MODALS
+════════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  padding: 16px;
+}
+.modal-overlay.active { opacity: 1; }
+
+.modal-box {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 40px 36px 32px;
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  transform: translateY(20px);
+  transition: transform 0.28s ease;
+}
+.modal-overlay.active .modal-box { transform: translateY(0); }
+
+.modal-close {
+  position: absolute;
+  top: 14px; right: 18px;
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.modal-close:hover { background: rgba(0,0,0,0.08); }
+
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 24px;
+}
+
+/* Form inside modal */
+.modal-box form { display: flex; flex-direction: column; gap: 14px; }
+
+.modal-box label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-box input {
+  padding: 11px 14px;
+  border: 1.5px solid rgba(45,106,79,0.25);
+  border-radius: 9px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  background: var(--hero-bg);
+  transition: border-color 0.2s;
+  outline: none;
+}
+.modal-box input:focus { border-color: var(--green-dark); }
+
+.form-btn {
+  background: var(--green-dark);
+  color: #fff;
+  border: none;
+  padding: 13px;
+  border-radius: 9px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background 0.2s, transform 0.15s;
+}
+.form-btn:hover { background: #1e4d38; transform: translateY(-1px); }
+.form-btn.btn-orange { background: var(--orange); }
+.form-btn.btn-orange:hover { background: #c96a28; }
+
+.form-msg {
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ════════════════════════════════════════════════════════════
+   BROWSE FOODS – food cards inside modal
+════════════════════════════════════════════════════════════ */
+#foodList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.food-card {
+  border: 1.5px solid rgba(45,106,79,0.18);
+  border-radius: 12px;
+  padding: 16px 18px;
+  background: var(--hero-bg);
+  transition: box-shadow 0.2s;
+}
+.food-card:hover { box-shadow: 0 4px 16px rgba(45,106,79,0.12); }
+
+.food-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.food-type {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+.food-qty {
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: var(--green-light);
+  color: var(--green-dark);
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+body.dark .food-qty { background: rgba(45,106,79,0.35); }
+
+.food-donor, .food-loc {
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.btn-claim {
+  margin-top: 10px;
+  width: 100%;
+  background: var(--green-dark);
+  color: #fff;
+  border: none;
+  padding: 9px 0;
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-claim:hover { background: #1e4d38; transform: translateY(-1px); }
+
+.food-loading, .food-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 24px 0;
+  font-size: 0.95rem;
+}
