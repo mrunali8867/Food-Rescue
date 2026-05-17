@@ -61,6 +61,21 @@ nav {
 }
 .logo span { color: var(--orange); }
 
+/* Hamburger – hidden on desktop */
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--green-dark);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  z-index: 200;
+}
+.hamburger:hover { background: rgba(45,106,79,0.1); }
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -406,12 +421,53 @@ footer a:hover { color: #fff; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 720px) {
-  nav { padding: 0 20px; }
-  .nav-links { gap: 12px; }
-  .nav-links a { display: none; }
+  nav {
+    padding: 0 20px;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 60px;
+  }
+
+  /* Show hamburger on mobile */
+  .hamburger { display: block; }
+
+  /* Hide nav links by default on mobile */
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    background: var(--nav-bg);
+    padding: 16px 0 20px;
+    border-top: 1px solid rgba(45,106,79,0.1);
+  }
+
+  /* Show nav when open */
+  .nav-links.nav-open { display: flex; }
+
+  .nav-links a {
+    display: block;
+    font-size: 1rem;
+    padding: 4px 0;
+  }
+
+  .btn-donate, .btn-signup-nav, .btn-signin {
+    width: 100%;
+    text-align: center;
+    padding: 11px 16px;
+  }
+
+  .btn-dark-toggle { align-self: flex-start; }
+
   .steps::before { display: none; }
   .steps { flex-direction: column; align-items: center; gap: 32px; }
   .stats { gap: 40px; }
+
+  .hero { padding: 40px 20px 60px; }
+  .hero h1 { font-size: clamp(2.4rem, 10vw, 3.5rem); }
+  .cards { gap: 20px; }
+  .card { padding: 28px 20px 24px; }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -441,8 +497,14 @@ footer a:hover { color: #fff; }
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   transform: translateY(20px);
   transition: transform 0.28s ease;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 .modal-overlay.active .modal-box { transform: translateY(0); }
+
+@media (max-width: 480px) {
+  .modal-box { padding: 32px 20px 24px; border-radius: 14px; }
+}
 
 .modal-close {
   position: absolute;
@@ -508,6 +570,7 @@ footer a:hover { color: #fff; }
   transition: background 0.2s, transform 0.15s;
 }
 .form-btn:hover { background: #1e4d38; transform: translateY(-1px); }
+.form-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 .form-btn.btn-orange { background: var(--orange); }
 .form-btn.btn-orange:hover { background: #c96a28; }
 
@@ -581,6 +644,7 @@ body.dark .food-qty { background: rgba(45,106,79,0.35); }
   transition: background 0.2s, transform 0.15s;
 }
 .btn-claim:hover { background: #1e4d38; transform: translateY(-1px); }
+.btn-claim:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
 .food-loading, .food-empty {
   text-align: center;
