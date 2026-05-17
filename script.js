@@ -1,14 +1,12 @@
 // ============================================================
-//  script.js  –  FoodRescue Frontend Logic  (FIXED)
-//  Handles: modals, dark mode, fetch() calls to backend
+//  script.js  –  FoodRescue Frontend Logic  (FINAL FIX)
 // ============================================================
 
-// FIX: Auto-detect the server URL so it works on both
-// localhost AND your phone (same WiFi). No more hardcoding!
+// Auto-detects server URL — works on localhost AND phone on same WiFi
 const API = window.location.origin;
 
 // ════════════════════════════════════════════════════════════
-//  DARK MODE TOGGLE
+//  DARK MODE
 // ════════════════════════════════════════════════════════════
 const darkToggle = document.getElementById('darkToggle');
 
@@ -33,18 +31,17 @@ window.addEventListener('scroll', () => {
 });
 
 // ════════════════════════════════════════════════════════════
-//  MOBILE HAMBURGER MENU
+//  MOBILE HAMBURGER
 // ════════════════════════════════════════════════════════════
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.querySelector('.nav-links');
 
 if (hamburger) {
-  hamburger.addEventListener('click', () => {
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
     navLinks.classList.toggle('nav-open');
     hamburger.textContent = navLinks.classList.contains('nav-open') ? '✕' : '☰';
   });
-
-  // Close nav when clicking outside
   document.addEventListener('click', (e) => {
     if (!nav.contains(e.target)) {
       navLinks.classList.remove('nav-open');
@@ -52,18 +49,6 @@ if (hamburger) {
     }
   });
 }
-
-// ════════════════════════════════════════════════════════════
-//  SMOOTH SCROLL
-// ════════════════════════════════════════════════════════════
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener('click', e => {
-    const href = link.getAttribute('href');
-    if (href === '#browse') { e.preventDefault(); openBrowseModal(); return; }
-    const target = document.querySelector(href);
-    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-  });
-});
 
 // ════════════════════════════════════════════════════════════
 //  SCROLL REVEAL
@@ -116,6 +101,18 @@ const statObserver = new IntersectionObserver(entries => {
 document.querySelectorAll('.stat').forEach(el => statObserver.observe(el));
 
 // ════════════════════════════════════════════════════════════
+//  SMOOTH SCROLL (only for #how — #browse handled separately)
+// ════════════════════════════════════════════════════════════
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    const href = link.getAttribute('href');
+    if (href === '#browse') return; // handled by browse listeners below
+    const target = document.querySelector(href);
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+// ════════════════════════════════════════════════════════════
 //  MODAL UTILITY
 // ════════════════════════════════════════════════════════════
 function createModal(id, title, bodyHTML) {
@@ -132,7 +129,8 @@ function createModal(id, title, bodyHTML) {
     </div>`;
 
   document.body.appendChild(overlay);
-  requestAnimationFrame(() => overlay.classList.add('active'));
+  // Double rAF ensures transition plays correctly in all browsers
+  requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('active')));
 
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.classList.contains('modal-close')) closeModal(id);
@@ -161,41 +159,45 @@ function setFormMsg(formEl, msg, isError = false) {
 }
 
 // ════════════════════════════════════════════════════════════
-//  NAV UPDATE AFTER SIGN IN / SIGN OUT
+//  NAV STATE after login / logout
 // ════════════════════════════════════════════════════════════
 function updateNavAfterLogin() {
-  const user = JSON.parse(sessionStorage.getItem('fr-user') || 'null');
-  const btnSignIn  = document.getElementById('btnSignIn');
-  const btnSignUp  = document.getElementById('btnSignUp');
-  const btnDonate  = document.getElementById('btnDonate');
+  const user      = JSON.parse(sessionStorage.getItem('fr-user') || 'null');
+  const btnSignIn = document.getElementById('btnSignIn');
+  const btnSignUp = document.getElementById('btnSignUp');
+  if (!btnSignIn || !btnSignUp) return;
 
   if (user) {
     btnSignIn.textContent = 'Sign Out';
-    btnSignUp.textContent = `👤 ${user.name.split(' ')[0]}`;
-    btnSignUp.style.pointerEvents = 'none';
-    btnDonate.style.display = 'inline-block';
+    btnSignUp.textContent = '👤 ' + user.name.split(' ')[0];
+    btnSignUp.style.cursor  = 'default';
+    btnSignUp.style.opacity = '0.8';
   } else {
     btnSignIn.textContent = 'Sign In';
     btnSignUp.textContent = 'Sign Up';
-    btnSignUp.style.pointerEvents = 'auto';
+    btnSignUp.style.cursor  = 'pointer';
+    btnSignUp.style.opacity = '1';
   }
 }
-
-// Run on page load
 updateNavAfterLogin();
 
 // ════════════════════════════════════════════════════════════
 //  SIGN UP
 // ════════════════════════════════════════════════════════════
 document.getElementById('btnSignUp').addEventListener('click', () => {
-  // If already logged in, do nothing
-  if (sessionStorage.getItem('fr-user')) return;
+  if (sessionStorage.getItem('fr-user')) return; // already logged in
 
   createModal('modal-signup', '🌱 Create Account', `
     <form id="formSignUp" novalidate>
-      <label>Full Name<input type="text" name="name" placeholder="e.g. Priya Sharma" required autocomplete="name"/></label>
-      <label>Email<input type="email" name="email" placeholder="you@example.com" required autocomplete="email"/></label>
-      <label>Password<input type="password" name="password" placeholder="Min 6 characters" required autocomplete="new-password"/></label>
+      <label>Full Name
+        <input type="text" name="name" placeholder="e.g. Priya Sharma" required autocomplete="name"/>
+      </label>
+      <label>Email
+        <input type="email" name="email" placeholder="you@example.com" required autocomplete="email"/>
+      </label>
+      <label>Password
+        <input type="password" name="password" placeholder="Min 6 characters" required autocomplete="new-password"/>
+      </label>
       <button type="submit" class="form-btn">Create Account</button>
     </form>
   `);
@@ -206,27 +208,31 @@ document.getElementById('btnSignUp').addEventListener('click', () => {
     const btn  = form.querySelector('button[type="submit"]');
     const { name, email, password } = Object.fromEntries(new FormData(form));
 
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setFormMsg(form, 'Please fill in all fields.', true); return;
+    }
+
     btn.textContent = 'Creating…';
     btn.disabled = true;
 
     try {
       const res  = await fetch(`${API}/api/signup`, {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body:    JSON.stringify({ name: name.trim(), email: email.trim(), password })
       });
       const data = await res.json();
       if (!res.ok) {
-        setFormMsg(form, data.error, true);
+        setFormMsg(form, data.error || 'Something went wrong.', true);
         btn.textContent = 'Create Account';
         btn.disabled = false;
         return;
       }
-      setFormMsg(form, `✅ ${data.message} You can now sign in.`);
+      setFormMsg(form, '✅ Account created! You can now Sign In.');
       form.reset();
       setTimeout(() => closeModal('modal-signup'), 1800);
-    } catch {
-      setFormMsg(form, '❌ Cannot reach server. Make sure it is running (npm start).', true);
+    } catch (err) {
+      setFormMsg(form, '❌ Cannot reach server. Is "npm start" running in terminal?', true);
       btn.textContent = 'Create Account';
       btn.disabled = false;
     }
@@ -237,9 +243,8 @@ document.getElementById('btnSignUp').addEventListener('click', () => {
 //  SIGN IN / SIGN OUT
 // ════════════════════════════════════════════════════════════
 document.getElementById('btnSignIn').addEventListener('click', () => {
-  // Handle Sign Out
-  const existing = sessionStorage.getItem('fr-user');
-  if (existing) {
+  // Already signed in → sign out
+  if (sessionStorage.getItem('fr-user')) {
     sessionStorage.removeItem('fr-user');
     updateNavAfterLogin();
     return;
@@ -247,8 +252,12 @@ document.getElementById('btnSignIn').addEventListener('click', () => {
 
   createModal('modal-signin', '🔑 Sign In', `
     <form id="formSignIn" novalidate>
-      <label>Email<input type="email" name="email" placeholder="you@example.com" required autocomplete="email"/></label>
-      <label>Password<input type="password" name="password" placeholder="Your password" required autocomplete="current-password"/></label>
+      <label>Email
+        <input type="email" name="email" placeholder="you@example.com" required autocomplete="email"/>
+      </label>
+      <label>Password
+        <input type="password" name="password" placeholder="Your password" required autocomplete="current-password"/>
+      </label>
       <button type="submit" class="form-btn">Sign In</button>
     </form>
   `);
@@ -259,29 +268,33 @@ document.getElementById('btnSignIn').addEventListener('click', () => {
     const btn  = form.querySelector('button[type="submit"]');
     const { email, password } = Object.fromEntries(new FormData(form));
 
+    if (!email.trim() || !password.trim()) {
+      setFormMsg(form, 'Please enter email and password.', true); return;
+    }
+
     btn.textContent = 'Signing in…';
     btn.disabled = true;
 
     try {
       const res  = await fetch(`${API}/api/signin`, {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body:    JSON.stringify({ email: email.trim(), password })
       });
       const data = await res.json();
       if (!res.ok) {
-        setFormMsg(form, data.error, true);
+        setFormMsg(form, data.error || 'Login failed.', true);
         btn.textContent = 'Sign In';
         btn.disabled = false;
         return;
       }
-      setFormMsg(form, `✅ ${data.message}`);
+      setFormMsg(form, '✅ ' + data.message);
       form.reset();
       sessionStorage.setItem('fr-user', JSON.stringify({ id: data.userId, name: data.name }));
       updateNavAfterLogin();
       setTimeout(() => closeModal('modal-signin'), 1500);
-    } catch {
-      setFormMsg(form, '❌ Cannot reach server. Make sure it is running (npm start).', true);
+    } catch (err) {
+      setFormMsg(form, '❌ Cannot reach server. Is "npm start" running in terminal?', true);
       btn.textContent = 'Sign In';
       btn.disabled = false;
     }
@@ -294,10 +307,18 @@ document.getElementById('btnSignIn').addEventListener('click', () => {
 document.getElementById('btnDonate').addEventListener('click', () => {
   createModal('modal-donate', '🌾 Donate Food', `
     <form id="formDonate" novalidate>
-      <label>Your Name<input type="text" name="donorName" placeholder="e.g. Rahul Mehta" required/></label>
-      <label>Food Type<input type="text" name="foodType" placeholder="e.g. Rice & Dal, Vegetables…" required/></label>
-      <label>Quantity<input type="text" name="quantity" placeholder="e.g. 5 kg, 10 plates" required/></label>
-      <label>Pickup Location<input type="text" name="pickupLocation" placeholder="e.g. Andheri West, Mumbai" required/></label>
+      <label>Your Name
+        <input type="text" name="donorName" placeholder="e.g. Rahul Mehta" required/>
+      </label>
+      <label>Food Type
+        <input type="text" name="foodType" placeholder="e.g. Rice & Dal, Vegetables…" required/>
+      </label>
+      <label>Quantity
+        <input type="text" name="quantity" placeholder="e.g. 5 kg, 10 plates" required/>
+      </label>
+      <label>Pickup Location
+        <input type="text" name="pickupLocation" placeholder="e.g. Andheri West, Mumbai" required/>
+      </label>
       <button type="submit" class="form-btn btn-orange">List My Donation</button>
     </form>
   `);
@@ -308,12 +329,8 @@ document.getElementById('btnDonate').addEventListener('click', () => {
     const btn     = form.querySelector('button[type="submit"]');
     const payload = Object.fromEntries(new FormData(form));
 
-    // Basic validation
-    for (const [key, val] of Object.entries(payload)) {
-      if (!val.trim()) {
-        setFormMsg(form, 'Please fill in all fields.', true);
-        return;
-      }
+    if (Object.values(payload).some(v => !v.trim())) {
+      setFormMsg(form, 'Please fill in all fields.', true); return;
     }
 
     btn.textContent = 'Submitting…';
@@ -321,22 +338,22 @@ document.getElementById('btnDonate').addEventListener('click', () => {
 
     try {
       const res  = await fetch(`${API}/api/donate`, {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body:    JSON.stringify(payload)
       });
       const data = await res.json();
       if (!res.ok) {
-        setFormMsg(form, data.error, true);
+        setFormMsg(form, data.error || 'Submission failed.', true);
         btn.textContent = 'List My Donation';
         btn.disabled = false;
         return;
       }
-      setFormMsg(form, `✅ ${data.message}`);
+      setFormMsg(form, '✅ ' + data.message);
       form.reset();
       setTimeout(() => closeModal('modal-donate'), 1800);
-    } catch {
-      setFormMsg(form, '❌ Cannot reach server. Make sure it is running (npm start).', true);
+    } catch (err) {
+      setFormMsg(form, '❌ Cannot reach server. Is "npm start" running in terminal?', true);
       btn.textContent = 'List My Donation';
       btn.disabled = false;
     }
@@ -346,14 +363,23 @@ document.getElementById('btnDonate').addEventListener('click', () => {
 // ════════════════════════════════════════════════════════════
 //  BROWSE FOODS
 // ════════════════════════════════════════════════════════════
+function openBrowseModal() {
+  createModal('modal-browse', '🥗 Available Foods', `<div id="foodList"></div>`);
+  // Small delay lets the modal DOM render before we inject food cards
+  setTimeout(() => {
+    const container = document.getElementById('foodList');
+    if (container) loadFoods(container);
+  }, 50);
+}
+
 async function loadFoods(containerEl) {
   containerEl.innerHTML = '<p class="food-loading">Loading available foods…</p>';
   try {
     const res = await fetch(`${API}/api/foods`);
-    if (!res.ok) throw new Error('Server error');
+    if (!res.ok) throw new Error('Server error ' + res.status);
     const foods = await res.json();
 
-    if (!foods.length) {
+    if (!Array.isArray(foods) || !foods.length) {
       containerEl.innerHTML = '<p class="food-empty">No food available right now. Check back soon!</p>';
       return;
     }
@@ -374,29 +400,17 @@ async function loadFoods(containerEl) {
       btn.addEventListener('click', () => claimFood(btn.dataset.id, containerEl));
     });
 
-  } catch {
-    containerEl.innerHTML = '<p class="food-empty">❌ Cannot reach server. Make sure it is running (npm start).</p>';
+  } catch (err) {
+    containerEl.innerHTML = '<p class="food-empty">❌ Cannot reach server. Is "npm start" running?</p>';
   }
 }
 
-function openBrowseModal() {
-  createModal('modal-browse', '🥗 Available Foods', `<div id="foodList"></div>`);
-  loadFoods(document.getElementById('foodList'));
-}
-
-// Nav "Browse Foods" link
-document.querySelectorAll('a[href="#browse"]').forEach(el =>
-  el.addEventListener('click', e => { e.preventDefault(); openBrowseModal(); })
-);
-
-// Hero card "Browse Food →" and "Become a Donor" buttons
-document.querySelectorAll('.btn-learn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    const href = btn.getAttribute('href');
-    if (href === '#browse') { e.preventDefault(); openBrowseModal(); }
-  });
+// Wire up all "Browse Foods" triggers (nav link + hero card)
+document.querySelectorAll('a[href="#browse"]').forEach(el => {
+  el.addEventListener('click', e => { e.preventDefault(); openBrowseModal(); });
 });
 
+// Hero card: "Become a Donor" → Donate modal
 document.querySelectorAll('.btn-primary').forEach(btn => {
   btn.addEventListener('click', e => {
     e.preventDefault();
@@ -404,6 +418,7 @@ document.querySelectorAll('.btn-primary').forEach(btn => {
   });
 });
 
+// Hero card: "Register as Recipient" → Sign Up modal
 document.querySelectorAll('.btn-outline').forEach(btn => {
   btn.addEventListener('click', e => {
     e.preventDefault();
@@ -415,36 +430,40 @@ document.querySelectorAll('.btn-outline').forEach(btn => {
 //  CLAIM FOOD
 // ════════════════════════════════════════════════════════════
 async function claimFood(foodId, containerEl) {
-  // Use logged-in user name if available, otherwise ask
   const user = JSON.parse(sessionStorage.getItem('fr-user') || 'null');
   let recipientName = user ? user.name : '';
 
   if (!recipientName) {
-    recipientName = prompt('Enter your name to claim this food:')?.trim();
+    recipientName = (prompt('Enter your name to claim this food:') || '').trim();
     if (!recipientName) return;
   }
 
   const card = containerEl.querySelector(`[data-id="${foodId}"]`);
-  const btn  = card?.querySelector('.btn-claim');
+  const btn  = card ? card.querySelector('.btn-claim') : null;
   if (btn) { btn.textContent = 'Claiming…'; btn.disabled = true; }
 
   try {
     const res  = await fetch(`${API}/api/claim/${foodId}`, {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recipientName })
+      body:    JSON.stringify({ recipientName })
     });
     const data = await res.json();
 
-    if (!res.ok) { alert(`❌ ${data.error}`); if (btn) { btn.textContent = 'Claim This Food'; btn.disabled = false; } return; }
+    if (!res.ok) {
+      alert('❌ ' + (data.error || 'Could not claim food.'));
+      if (btn) { btn.textContent = 'Claim This Food'; btn.disabled = false; }
+      return;
+    }
 
-    alert(`✅ ${data.message}`);
-    card?.remove();
-    if (!containerEl.querySelector('.food-card'))
+    alert('✅ ' + data.message);
+    card && card.remove();
+    if (!containerEl.querySelector('.food-card')) {
       containerEl.innerHTML = '<p class="food-empty">All food has been claimed! Check back later.</p>';
+    }
 
-  } catch {
-    alert('❌ Cannot reach server. Make sure it is running.');
+  } catch (err) {
+    alert('❌ Cannot reach server. Is "npm start" running?');
     if (btn) { btn.textContent = 'Claim This Food'; btn.disabled = false; }
   }
 }
