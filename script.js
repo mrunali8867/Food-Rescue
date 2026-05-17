@@ -1,9 +1,11 @@
 // ============================================================
-//  script.js  –  FoodRescue Frontend Logic
+//  script.js  –  FoodRescue Frontend Logic  (FIXED)
 //  Handles: modals, dark mode, fetch() calls to backend
 // ============================================================
 
-const API = 'http://localhost:3000';  // Change if deploying remotely
+// FIX: Auto-detect the server URL so it works on both
+// localhost AND your phone (same WiFi). No more hardcoding!
+const API = window.location.origin;
 
 // ════════════════════════════════════════════════════════════
 //  DARK MODE TOGGLE
@@ -31,11 +33,34 @@ window.addEventListener('scroll', () => {
 });
 
 // ════════════════════════════════════════════════════════════
+//  MOBILE HAMBURGER MENU
+// ════════════════════════════════════════════════════════════
+const hamburger = document.getElementById('hamburger');
+const navLinks  = document.querySelector('.nav-links');
+
+if (hamburger) {
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('nav-open');
+    hamburger.textContent = navLinks.classList.contains('nav-open') ? '✕' : '☰';
+  });
+
+  // Close nav when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!nav.contains(e.target)) {
+      navLinks.classList.remove('nav-open');
+      hamburger.textContent = '☰';
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════
 //  SMOOTH SCROLL
 // ════════════════════════════════════════════════════════════
 document.querySelectorAll('a[href^="#"]').forEach(link => {
   link.addEventListener('click', e => {
-    const target = document.querySelector(link.getAttribute('href'));
+    const href = link.getAttribute('href');
+    if (href === '#browse') { e.preventDefault(); openBrowseModal(); return; }
+    const target = document.querySelector(href);
     if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
   });
 });
@@ -136,14 +161,41 @@ function setFormMsg(formEl, msg, isError = false) {
 }
 
 // ════════════════════════════════════════════════════════════
+//  NAV UPDATE AFTER SIGN IN / SIGN OUT
+// ════════════════════════════════════════════════════════════
+function updateNavAfterLogin() {
+  const user = JSON.parse(sessionStorage.getItem('fr-user') || 'null');
+  const btnSignIn  = document.getElementById('btnSignIn');
+  const btnSignUp  = document.getElementById('btnSignUp');
+  const btnDonate  = document.getElementById('btnDonate');
+
+  if (user) {
+    btnSignIn.textContent = 'Sign Out';
+    btnSignUp.textContent = `👤 ${user.name.split(' ')[0]}`;
+    btnSignUp.style.pointerEvents = 'none';
+    btnDonate.style.display = 'inline-block';
+  } else {
+    btnSignIn.textContent = 'Sign In';
+    btnSignUp.textContent = 'Sign Up';
+    btnSignUp.style.pointerEvents = 'auto';
+  }
+}
+
+// Run on page load
+updateNavAfterLogin();
+
+// ════════════════════════════════════════════════════════════
 //  SIGN UP
 // ════════════════════════════════════════════════════════════
 document.getElementById('btnSignUp').addEventListener('click', () => {
+  // If already logged in, do nothing
+  if (sessionStorage.getItem('fr-user')) return;
+
   createModal('modal-signup', '🌱 Create Account', `
     <form id="formSignUp" novalidate>
-      <label>Full Name<input type="text" name="name" placeholder="e.g. Priya Sharma" required/></label>
-      <label>Email<input type="email" name="email" placeholder="you@example.com" required/></label>
-      <label>Password<input type="password" name="password" placeholder="Min 6 characters" required/></label>
+      <label>Full Name<input type="text" name="name" placeholder="e.g. Priya Sharma" required autocomplete="name"/></label>
+      <label>Email<input type="email" name="email" placeholder="you@example.com" required autocomplete="email"/></label>
+      <label>Password<input type="password" name="password" placeholder="Min 6 characters" required autocomplete="new-password"/></label>
       <button type="submit" class="form-btn">Create Account</button>
     </form>
   `);
@@ -151,35 +203,52 @@ document.getElementById('btnSignUp').addEventListener('click', () => {
   document.getElementById('formSignUp').addEventListener('submit', async e => {
     e.preventDefault();
     const form = e.target;
+    const btn  = form.querySelector('button[type="submit"]');
     const { name, email, password } = Object.fromEntries(new FormData(form));
 
-    console.log('[SIGNUP DATA]', { name, email, password });
+    btn.textContent = 'Creating…';
+    btn.disabled = true;
 
     try {
-      const res  = await fetch(`${API}/signup`, {
+      const res  = await fetch(`${API}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })
       });
       const data = await res.json();
-      if (!res.ok) return setFormMsg(form, data.error, true);
+      if (!res.ok) {
+        setFormMsg(form, data.error, true);
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
+        return;
+      }
       setFormMsg(form, `✅ ${data.message} You can now sign in.`);
       form.reset();
       setTimeout(() => closeModal('modal-signup'), 1800);
     } catch {
-      setFormMsg(form, '❌ Could not connect to server. Is it running?', true);
+      setFormMsg(form, '❌ Cannot reach server. Make sure it is running (npm start).', true);
+      btn.textContent = 'Create Account';
+      btn.disabled = false;
     }
   });
 });
 
 // ════════════════════════════════════════════════════════════
-//  SIGN IN
+//  SIGN IN / SIGN OUT
 // ════════════════════════════════════════════════════════════
 document.getElementById('btnSignIn').addEventListener('click', () => {
+  // Handle Sign Out
+  const existing = sessionStorage.getItem('fr-user');
+  if (existing) {
+    sessionStorage.removeItem('fr-user');
+    updateNavAfterLogin();
+    return;
+  }
+
   createModal('modal-signin', '🔑 Sign In', `
     <form id="formSignIn" novalidate>
-      <label>Email<input type="email" name="email" placeholder="you@example.com" required/></label>
-      <label>Password<input type="password" name="password" placeholder="Your password" required/></label>
+      <label>Email<input type="email" name="email" placeholder="you@example.com" required autocomplete="email"/></label>
+      <label>Password<input type="password" name="password" placeholder="Your password" required autocomplete="current-password"/></label>
       <button type="submit" class="form-btn">Sign In</button>
     </form>
   `);
@@ -187,24 +256,34 @@ document.getElementById('btnSignIn').addEventListener('click', () => {
   document.getElementById('formSignIn').addEventListener('submit', async e => {
     e.preventDefault();
     const form = e.target;
+    const btn  = form.querySelector('button[type="submit"]');
     const { email, password } = Object.fromEntries(new FormData(form));
 
-    console.log('[SIGNIN DATA]', { email, password });
+    btn.textContent = 'Signing in…';
+    btn.disabled = true;
 
     try {
-      const res  = await fetch(`${API}/signin`, {
+      const res  = await fetch(`${API}/api/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
-      if (!res.ok) return setFormMsg(form, data.error, true);
+      if (!res.ok) {
+        setFormMsg(form, data.error, true);
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+        return;
+      }
       setFormMsg(form, `✅ ${data.message}`);
       form.reset();
       sessionStorage.setItem('fr-user', JSON.stringify({ id: data.userId, name: data.name }));
+      updateNavAfterLogin();
       setTimeout(() => closeModal('modal-signin'), 1500);
     } catch {
-      setFormMsg(form, '❌ Could not connect to server. Is it running?', true);
+      setFormMsg(form, '❌ Cannot reach server. Make sure it is running (npm start).', true);
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
     }
   });
 });
@@ -225,24 +304,41 @@ document.getElementById('btnDonate').addEventListener('click', () => {
 
   document.getElementById('formDonate').addEventListener('submit', async e => {
     e.preventDefault();
-    const form = e.target;
+    const form    = e.target;
+    const btn     = form.querySelector('button[type="submit"]');
     const payload = Object.fromEntries(new FormData(form));
 
-    console.log('[DONATE DATA]', payload);
+    // Basic validation
+    for (const [key, val] of Object.entries(payload)) {
+      if (!val.trim()) {
+        setFormMsg(form, 'Please fill in all fields.', true);
+        return;
+      }
+    }
+
+    btn.textContent = 'Submitting…';
+    btn.disabled = true;
 
     try {
-      const res  = await fetch(`${API}/donate`, {
+      const res  = await fetch(`${API}/api/donate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (!res.ok) return setFormMsg(form, data.error, true);
+      if (!res.ok) {
+        setFormMsg(form, data.error, true);
+        btn.textContent = 'List My Donation';
+        btn.disabled = false;
+        return;
+      }
       setFormMsg(form, `✅ ${data.message}`);
       form.reset();
       setTimeout(() => closeModal('modal-donate'), 1800);
     } catch {
-      setFormMsg(form, '❌ Could not connect to server. Is it running?', true);
+      setFormMsg(form, '❌ Cannot reach server. Make sure it is running (npm start).', true);
+      btn.textContent = 'List My Donation';
+      btn.disabled = false;
     }
   });
 });
@@ -253,7 +349,8 @@ document.getElementById('btnDonate').addEventListener('click', () => {
 async function loadFoods(containerEl) {
   containerEl.innerHTML = '<p class="food-loading">Loading available foods…</p>';
   try {
-    const res   = await fetch(`${API}/foods`);
+    const res = await fetch(`${API}/api/foods`);
+    if (!res.ok) throw new Error('Server error');
     const foods = await res.json();
 
     if (!foods.length) {
@@ -278,7 +375,7 @@ async function loadFoods(containerEl) {
     });
 
   } catch {
-    containerEl.innerHTML = '<p class="food-empty">❌ Could not reach server. Make sure it\'s running.</p>';
+    containerEl.innerHTML = '<p class="food-empty">❌ Cannot reach server. Make sure it is running (npm start).</p>';
   }
 }
 
@@ -292,35 +389,62 @@ document.querySelectorAll('a[href="#browse"]').forEach(el =>
   el.addEventListener('click', e => { e.preventDefault(); openBrowseModal(); })
 );
 
-// Hero card buttons
-document.getElementById('cardDonate')?.addEventListener('click', e => { e.preventDefault(); document.getElementById('btnDonate').click(); });
-document.getElementById('cardBrowse')?.addEventListener('click', e => { e.preventDefault(); document.getElementById('btnSignUp').click(); });
+// Hero card "Browse Food →" and "Become a Donor" buttons
+document.querySelectorAll('.btn-learn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const href = btn.getAttribute('href');
+    if (href === '#browse') { e.preventDefault(); openBrowseModal(); }
+  });
+});
+
+document.querySelectorAll('.btn-primary').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('btnDonate').click();
+  });
+});
+
+document.querySelectorAll('.btn-outline').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('btnSignUp').click();
+  });
+});
 
 // ════════════════════════════════════════════════════════════
 //  CLAIM FOOD
 // ════════════════════════════════════════════════════════════
 async function claimFood(foodId, containerEl) {
-  const recipientName = prompt('Enter your name to claim this food:')?.trim();
-  if (!recipientName) return;
+  // Use logged-in user name if available, otherwise ask
+  const user = JSON.parse(sessionStorage.getItem('fr-user') || 'null');
+  let recipientName = user ? user.name : '';
+
+  if (!recipientName) {
+    recipientName = prompt('Enter your name to claim this food:')?.trim();
+    if (!recipientName) return;
+  }
+
+  const card = containerEl.querySelector(`[data-id="${foodId}"]`);
+  const btn  = card?.querySelector('.btn-claim');
+  if (btn) { btn.textContent = 'Claiming…'; btn.disabled = true; }
 
   try {
-    const res  = await fetch(`${API}/claim/${foodId}`, {
+    const res  = await fetch(`${API}/api/claim/${foodId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ recipientName })
     });
     const data = await res.json();
 
-    if (!res.ok) { alert(`❌ ${data.error}`); return; }
+    if (!res.ok) { alert(`❌ ${data.error}`); if (btn) { btn.textContent = 'Claim This Food'; btn.disabled = false; } return; }
 
     alert(`✅ ${data.message}`);
-    console.log(`[CLAIM] Food ID ${foodId} claimed by ${recipientName}`);
-
-    containerEl.querySelector(`[data-id="${foodId}"]`)?.remove();
+    card?.remove();
     if (!containerEl.querySelector('.food-card'))
       containerEl.innerHTML = '<p class="food-empty">All food has been claimed! Check back later.</p>';
 
   } catch {
-    alert('❌ Could not connect to server.');
+    alert('❌ Cannot reach server. Make sure it is running.');
+    if (btn) { btn.textContent = 'Claim This Food'; btn.disabled = false; }
   }
 }
